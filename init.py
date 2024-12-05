@@ -21,8 +21,8 @@ def affiche(liste):
                 element ="C"
             print (element, end=" ")
         print()
+    time.sleep(1/20)
     system("cls")
-    time.sleep(0.001)
     return ""
     
 
