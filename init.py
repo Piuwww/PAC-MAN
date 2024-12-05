@@ -37,6 +37,6 @@ labi = [[1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1,1,1]]   
 #code
-
-affiche(labi)
-input()
+fin=False
+while not (fin):
+    affiche(labi)
