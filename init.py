@@ -2,7 +2,7 @@
 from os import system
 from random import randint
 from sys import platform
-from time import sleep, time
+import time
 #fonction
 def clear():
     if platform.startswith("win"):
@@ -21,8 +21,10 @@ def affiche(liste):
                 element ="C"
             print (element, end=" ")
         print()
+    system("cls")
+    time.sleep(0.001)
     return ""
-
+    
 
 
 
