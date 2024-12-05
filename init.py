@@ -10,18 +10,33 @@ def clear():
     else:
         system("clear")
 
-def affiche():
+def affiche(liste):
+    for i in range (len(liste)):
+        for element in liste[i]:
+            if element == 0 :
+                element =" "
+            if element == 1:
+                element ="□"
+            if element == 2 :
+                element ="C"
+            print (element, end=" ")
+        print()
+    return ""
+
 
 
 
 #init
 pac = 2
-labi = [[1,1,1,1,1,1,1,1,1,1]
-        [1,0,0,0,0,0,0,0,0,1]
-        [1,0,0,0,0,0,0,0,0,1]
-        [1,0,0,0,0,0,0,0,0,1]
-        [1,0,0,0,pac,0,0,0,0,1]
-        [1,0,0,0,0,0,0,0,0,1]
-        [1,0,0,0,0,0,0,0,0,1]
+labi = [[1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,pac,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1,1,1]]   
 #code
+
+affiche(labi)
+input()
