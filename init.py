@@ -34,6 +34,15 @@ def aski():
     if kbhit():
         z = getch() #lecture touche
         code  = ord(z) # code ASCII
+        if code==122: #Z
+            return
+        if code==113: #Q
+            return
+        if code==115: #S
+            return
+        if code==100: #D
+            return
+
 		
 def mouvement(aski):
     i , j = affiche(labi)
