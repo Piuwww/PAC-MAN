@@ -13,6 +13,12 @@ else:
 
 
 # fonction
+def affiche_refresh(a): #a c'est le refresh rate fréquence de màj
+    for i in range (2):
+        clear() 
+        affiche()
+        sleep(1/a)
+
 def clear():
     if windows:
         system("cls")
@@ -117,6 +123,7 @@ jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
+<<<<<<< HEAD
 
 fps = int(input("FPS:\n"))
 
@@ -138,3 +145,10 @@ while True:
         userInputUnix()
 
     sleep(1 / fps)
+||||||| 2f59472
+
+affiche()
+=======
+while True:
+    affiche_refresh(60) 
+>>>>>>> ba92fea5da67ea49df7d91f750c313b904645717
