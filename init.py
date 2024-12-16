@@ -123,8 +123,6 @@ jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-<<<<<<< HEAD
-
 fps = int(input("FPS:\n"))
 
 pacmanPosX = 0
@@ -137,18 +135,9 @@ for i in range(len(jeu)):
             pacmanPosY = j
 
 while True:
-    clear()
-    affiche()
+    affiche_refresh(fps)
     if windows:
         userInputWindows()
     else:
         userInputUnix()
 
-    sleep(1 / fps)
-||||||| 2f59472
-
-affiche()
-=======
-while True:
-    affiche_refresh(60) 
->>>>>>> ba92fea5da67ea49df7d91f750c313b904645717
