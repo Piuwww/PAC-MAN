@@ -56,7 +56,7 @@ def affiche():  # Pour faire jolie
             elif case == 4:
                 print("🍓", end=" ")
             else:
-                print(" ", end=" ")
+                print("  ", end="")
         print("│", end="")
         print()
 
@@ -67,23 +67,21 @@ def affiche():  # Pour faire jolie
     print("\n")
 
 
-def UserInputGame(code, pacmanPosX, pacmanPosY):
+def UserInputGame(code):
     if code == 122:  # z
-        jeu[pacmanPosY][pacmanPosX] = [pacmanPosY + 1][pacmanPosX]
-        pacmanPosY += 1
-        affiche()
+        return "z"
     elif code == 113:  # q
-        print("Left")
+        return "q"
     elif code == 115:  # s
-        print("Down")
+        return "s"
     elif code == 100:  # d
-        print("Right")
+        return "d"
     elif code == 81:  # Q
         print("Quit le jeu")
         exit()
 
 
-def userInputUnix():
+def userInputLinux():
     fd = sys.stdin.fileno()  # Ouvre un buffer/tty/terminal
     old_settings = termios.tcgetattr(fd)  # Prend les paramètres du buffer/tty
     try:
@@ -96,13 +94,33 @@ def userInputUnix():
             fd, termios.TCSADRAIN, old_settings
         )
 
-    UserInputGame(ord(character), pacmanPosX, pacmanPosY)
+    UserInputGame(ord(character))
 
 
-def userInputWindows():
-    if msvcrt.khbit():
+def UserInputWindows():
+    if msvcrt.kbhit():
         character = msvcrt.getch()
-        UserInputGame(ord(character), pacmanPosX, pacmanPosY)
+        UserInputGame(ord(character))
+
+
+def check_mouvement(x,y):
+    UserInputWindows()
+    if "z" and jeu[x+1][y]==0:
+        return True
+    if "q" and 2[x][y-1]==0:
+        return True
+    if "s" and 2[x-1][y]==0:
+        return True
+    if "d" and 2[x][y+1]==0:
+        return True
+
+#def mouvement():
+
+
+def jouer():
+    affiche_refresh(60)
+    UserInputWindows()
+
 
 
 # init
@@ -123,21 +141,5 @@ jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-fps = int(input("FPS:\n"))
-
-pacmanPosX = 0
-pacmanPosY = 0
-
-for i in range(len(jeu)):
-    for j in range(len(jeu[0])):
-        if jeu[i][j] == 2:
-            pacmanPosX = i
-            pacmanPosY = j
-
 while True:
-    affiche_refresh(fps)
-    if windows:
-        userInputWindows()
-    else:
-        userInputUnix()
-
+    jouer()
