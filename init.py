@@ -57,7 +57,7 @@ def affiche():  # Pour faire jolie
             elif case == 4:
                 print("🍓", end=" ")
             else:
-                print(" ", end=" ")
+                print("  ", end="")
         print("│", end="")
         print()
 
@@ -107,10 +107,28 @@ def userInputUnix():
     return UserInputGame(ord(character), pacmanPosX, pacmanPosY)
 
 
-def userInputWindows():
-    if msvcrt.khbit():
+def UserInputWindows():
+    if msvcrt.kbhit():
         character = msvcrt.getch()
         return UserInputGame(ord(character), pacmanPosX, pacmanPosY)
+
+
+def check_mouvement(x,y):
+    UserInputWindows()
+    if "z" and jeu[x+1][y]==0:
+        return True
+    if "q" and 2[x][y-1]==0:
+        return True
+    if "s" and 2[x-1][y]==0:
+        return True
+    if "d" and 2[x][y+1]==0:
+        return True
+    else:
+        return False
+
+def jouer():
+    affiche_refresh(60)
+    UserInputWindows()
 
 
 # init
