@@ -1,5 +1,6 @@
 from os import system
 from sys import platform
+from time import sleep
 
 windows = platform.startswith("win")
 
@@ -49,7 +50,7 @@ def affiche():  # Pour faire jolie
             elif case == 4:
                 print("🍓", end=" ")
             else:
-                print("  ", end="")
+                print(" ", end=" ")
         print("│", end="")
         print()
 
@@ -60,21 +61,23 @@ def affiche():  # Pour faire jolie
     print("\n")
 
 
-def UserInputGame(code):
+def UserInputGame(code, pacmanPosX, pacmanPosY):
     if code == 122:  # z
-        print("Up")
+        jeu[pacmanPosY][pacmanPosX] = [pacmanPosY + 1][pacmanPosX]
+        pacmanPosY += 1
+        affiche()
     elif code == 113:  # q
         print("Left")
     elif code == 115:  # s
         print("Down")
     elif code == 100:  # d
-        print("Down")
+        print("Right")
     elif code == 81:  # Q
         print("Quit le jeu")
         exit()
 
 
-def userInputLinux():
+def userInputUnix():
     fd = sys.stdin.fileno()  # Ouvre un buffer/tty/terminal
     old_settings = termios.tcgetattr(fd)  # Prend les paramètres du buffer/tty
     try:
@@ -87,13 +90,13 @@ def userInputLinux():
             fd, termios.TCSADRAIN, old_settings
         )
 
-    UserInputGame(ord(character))
+    UserInputGame(ord(character), pacmanPosX, pacmanPosY)
 
 
-def UserInputWindows():
+def userInputWindows():
     if msvcrt.khbit():
         character = msvcrt.getch()
-        UserInputGame(ord(character))
+        UserInputGame(ord(character), pacmanPosX, pacmanPosY)
 
 
 # init
@@ -115,4 +118,23 @@ jeu = [
 ]
 
 
-affiche()
+fps = int(input("FPS:\n"))
+
+pacmanPosX = 0
+pacmanPosY = 0
+
+for i in range(len(jeu)):
+    for j in range(len(jeu[0])):
+        if jeu[i][j] == 2:
+            pacmanPosX = i
+            pacmanPosY = j
+
+while True:
+    clear()
+    affiche()
+    if windows:
+        userInputWindows()
+    else:
+        userInputUnix()
+
+    sleep(1 / fps)
