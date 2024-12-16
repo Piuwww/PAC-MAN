@@ -13,11 +13,12 @@ else:
 
 
 # fonction
-def affiche_refresh(a): #a c'est le refresh rate fréquence de màj
-    for i in range (2):
-        clear() 
+def affiche_refresh(a):  # a c'est le refresh rate fréquence de màj
+    for i in range(2):
+        clear()
         affiche()
-        sleep(1/a)
+        sleep(1 / a)
+
 
 def clear():
     if windows:
@@ -69,16 +70,23 @@ def affiche():  # Pour faire jolie
 
 def UserInputGame(code, pacmanPosX, pacmanPosY):
     if code == 122:  # z
-        jeu[pacmanPosY][pacmanPosX] = [pacmanPosY + 1][pacmanPosX]
-        pacmanPosY += 1
-        affiche()
+        jeu[pacmanPosY - 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return pacmanPosX, pacmanPosY - 1
     elif code == 113:  # q
-        print("Left")
+        jeu[pacmanPosY][pacmanPosX - 1] = jeu[pacmanPosY][pacmanPosX]
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return pacmanPosX - 1, pacmanPosY
     elif code == 115:  # s
-        print("Down")
+        jeu[pacmanPosY + 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return pacmanPosX, pacmanPosY + 1
     elif code == 100:  # d
-        print("Right")
+        jeu[pacmanPosY][pacmanPosX + 1] = jeu[pacmanPosY][pacmanPosX]
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return pacmanPosX + 1, pacmanPosY
     elif code == 81:  # Q
+        clear()
         print("Quit le jeu")
         exit()
 
@@ -96,13 +104,13 @@ def userInputUnix():
             fd, termios.TCSADRAIN, old_settings
         )
 
-    UserInputGame(ord(character), pacmanPosX, pacmanPosY)
+    return UserInputGame(ord(character), pacmanPosX, pacmanPosY)
 
 
 def userInputWindows():
     if msvcrt.khbit():
         character = msvcrt.getch()
-        UserInputGame(ord(character), pacmanPosX, pacmanPosY)
+        return UserInputGame(ord(character), pacmanPosX, pacmanPosY)
 
 
 # init
@@ -123,21 +131,14 @@ jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-fps = int(input("FPS:\n"))
+fps = 60
 
-pacmanPosX = 0
-pacmanPosY = 0
-
-for i in range(len(jeu)):
-    for j in range(len(jeu[0])):
-        if jeu[i][j] == 2:
-            pacmanPosX = i
-            pacmanPosY = j
+pacmanPosX = 9
+pacmanPosY = 7
 
 while True:
     affiche_refresh(fps)
     if windows:
-        userInputWindows()
+        pos = userInputWindows()
     else:
-        userInputUnix()
-
+        pacmanPosX, pacmanPosY = userInputUnix()
