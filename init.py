@@ -19,18 +19,19 @@ def clear():
         system("clear")
 
 
-YELLOW = "\033[33m"
+YELLOW = "\033[33m"  # Les couleurs
 RED = "\033[91m"
 GREY = "\033[90m"
 BLUE = "\033[34m"
-RESET = "\033[0m"
+
+RESET = "\033[0m"  # Annule la couleur
 
 
 def affiche():  # Pour faire jolie
     nombre = 0
-    longueur = len(jeu)
+    longueur = int(len(jeu))
     print("╭", end="")
-    print("─" * ((longueur * 2) + 1), end="")
+    print("─" * int(longueur * 2.8), end="")
     print("╮", end="")
     print()
     for ligne in jeu:
@@ -39,13 +40,13 @@ def affiche():  # Pour faire jolie
         for case in ligne:
             if case == 0:
                 print(f"{GREY}·{RESET}", end=" ")
-            elif case == 1:
-                pass
+            else:
+                print("  ", end="")
         print("│", end="")
         print()
 
     print("╰", end="")
-    print("─" * ((longueur * 2) + 1), end="")
+    print("─" * int(longueur * 2.8), end="")
     print("╯")
 
     print("\n")
@@ -105,5 +106,4 @@ jeu = [
 ]
 
 
-while True:
-    affiche()
+affiche()
