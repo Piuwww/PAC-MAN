@@ -1,78 +1,109 @@
-#import
 from os import system
-from random import randint
 from sys import platform
-import time
-from msvcrt import getch,kbhit
 
-#fonction
+windows = platform.startswith("win")
+
+if windows:
+    import msvcrt
+else:
+    import sys
+    import termios
+    import tty
+
+
+# fonction
 def clear():
-    if platform.startswith("win"):
+    if windows:
         system("cls")
     else:
         system("clear")
 
-def affiche(liste):
-    pac_l = 0
-    pac_c = 0
-    for i in range (len(liste)):
-        for j in range (liste[i]) :
-            if labi[i][j] == 0 :
-                element =" "
-            if labi[i][j] == 1:
-                element ="□"
-            if labi[i][j] == 2 :
-                element ="ᗧ"
-                pac_l = j
-                pac_c = i
-            print (element, end=" ")
+
+YELLOW = "\033[33m"
+RED = "\033[91m"
+GREY = "\033[90m"
+BLUE = "\033[34m"
+RESET = "\033[0m"
+
+
+def affiche():  # Pour faire jolie
+    nombre = 0
+    longueur = len(jeu)
+    print("╭", end="")
+    print("─" * ((longueur * 2) + 1), end="")
+    print("╮", end="")
+    print()
+    for ligne in jeu:
+        nombre += 1
+        print("│ ", end="")
+        for case in ligne:
+            if case == 0:
+                print(f"{GREY}·{RESET}", end=" ")
+            elif case == 1:
+                pass
+        print("│", end="")
         print()
-    time.sleep(1/30)
-    system("cls")
-    return i , j
 
-def aski():
-    if kbhit():
-        z = getch() #lecture touche
-        code  = ord(z) # code ASCII
-        if code==122 or code==38: #Z
-            return i+1
-        if code==113 or code==37: #Q
-            return j-1
-        if code==115 or code==40: #S
-            return i-1
-        if code==100 or code==39: #D
-            return j+1
+    print("╰", end="")
+    print("─" * ((longueur * 2) + 1), end="")
+    print("╯")
 
-		
-def mouvement(aski):
-    i , j = affiche(labi)
-    if aski == 122 :
-        labi[i][j]
-    if aski == 121 :
-        labi[i][j]
+    print("\n")
 
 
-    
-
-#init
-labi = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]   
+def UserInputGame(code):
+    if code == 122:  # z
+        print("Up")
+    elif code == 113:  # q
+        print("Left")
+    elif code == 115:  # s
+        print("Down")
+    elif code == 100:  # d
+        print("Down")
+    elif code == 81:  # Q
+        print("Quit le jeu")
+        exit()
 
 
-#code
-fin=False
-while not (fin):
-    affiche(labi)
+def userInputLinux():
+    fd = sys.stdin.fileno()  # Ouvre un buffer/tty/terminal
+    old_settings = termios.tcgetattr(fd)  # Prend les paramètres du buffer/tty
+    try:
+        tty.setraw(  # Ne print pas les charactères écrits, pas besoin de <enter>
+            sys.stdin.fileno()
+        )
+        character = sys.stdin.read(1)  # Lis 1 seule charactère
+    finally:
+        termios.tcsetattr(  # Définis les paramètres du tty/buffer
+            fd, termios.TCSADRAIN, old_settings
+        )
+
+    UserInputGame(ord(character))
+
+
+def UserInputWindows():
+    character = msvcrt.getch()
+    UserInputGame(ord(character))
+
+
+# init
+jeu = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+]
+
+
+while True:
+    affiche()
