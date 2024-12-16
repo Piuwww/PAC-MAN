@@ -113,6 +113,8 @@ def check_mouvement(x,y):
         return True
     if "d" and 2[x][y+1]==0:
         return True
+    else:
+        return False
 
 #def mouvement():
 
