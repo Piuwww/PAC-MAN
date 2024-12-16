@@ -40,6 +40,14 @@ def affiche():  # Pour faire jolie
         for case in ligne:
             if case == 0:
                 print(f"{GREY}·{RESET}", end=" ")
+            elif case == 1:
+                print(f"{BLUE}8{RESET}", end=" ")
+            elif case == 2:
+                print(f"{YELLOW}ᗤ{RESET}", end=" ")
+            elif case == 3:
+                print(f"{RED}ᗣ{RESET}", end=" ")
+            elif case == 4:
+                print("🍓", end=" ")
             else:
                 print("  ", end="")
         print("│", end="")
@@ -83,8 +91,9 @@ def userInputLinux():
 
 
 def UserInputWindows():
-    character = msvcrt.getch()
-    UserInputGame(ord(character))
+    if msvcrt.khbit():
+        character = msvcrt.getch()
+        UserInputGame(ord(character))
 
 
 # init
