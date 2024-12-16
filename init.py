@@ -1,5 +1,6 @@
 from os import system
 from sys import platform
+from time import sleep
 
 windows = platform.startswith("win")
 
