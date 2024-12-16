@@ -12,6 +12,12 @@ else:
 
 
 # fonction
+def affiche_refresh(a): #a c'est le refresh rate fréquence de màj
+    for i in range (2):
+        clear() 
+        affiche()
+        sleep(1/a)
+
 def clear():
     if windows:
         system("cls")
@@ -114,5 +120,5 @@ jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-
-affiche()
+while True:
+    affiche_refresh(60) 
