@@ -13,11 +13,10 @@ else:
 
 
 # fonction
-def affiche_refresh(a):  # a c'est le refresh rate fréquence de màj
-    for i in range(2):
-        clear()
-        affiche()
-        sleep(1 / a)
+def affiche_refresh(fps):
+    clear()
+    affiche()
+    sleep(1 / fps)
 
 
 def clear():
@@ -33,6 +32,13 @@ GREY = "\033[90m"
 BLUE = "\033[34m"
 
 RESET = "\033[0m"  # Annule la couleur
+
+
+def locatePacman():
+    for i in range(len(jeu)):
+        for j in range(len(jeu[0])):
+            if jeu[i][j] == 2:
+                return j, i  # x, y
 
 
 def affiche():  # Pour faire jolie
@@ -68,23 +74,39 @@ def affiche():  # Pour faire jolie
     print("\n")
 
 
-def UserInputGame(code, pacmanPosX, pacmanPosY):
+def pacmanMouvement(pacmanPosX, pacmanPosY, a, b):
+    if pacmanPosX + a > 18 and jeu[pacmanPosY][0] == 0:
+        jeu[pacmanPosY][0] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return 0, pacmanPosY
+    elif pacmanPosX + a < 0 and jeu[pacmanPosY][18] == 0:
+        jeu[pacmanPosY][18] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return 13, pacmanPosY
+    elif pacmanPosY + b > 13 and jeu[0][pacmanPosX] == 0:
+        jeu[0][pacmanPosX] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return pacmanPosX, 0
+    elif pacmanPosX + b < 0 and jeu[13][pacmanPosX] == 0:
+        jeu[13][pacmanPosX] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return pacmanPosX, 13
+    elif jeu[pacmanPosY + b][pacmanPosX + a] == 0:
+        jeu[pacmanPosY + b][pacmanPosX + a] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+
+
+def UserInputGame(code):
+    pacmanPosX, pacmanPosY = locatePacman()
+
     if code == 122:  # z
-        jeu[pacmanPosY - 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX, pacmanPosY - 1
+        pacmanMouvement(pacmanPosX, pacmanPosY, 0, -1)
     elif code == 113:  # q
-        jeu[pacmanPosY][pacmanPosX - 1] = jeu[pacmanPosY][pacmanPosX]
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX - 1, pacmanPosY
+        pacmanMouvement(pacmanPosX, pacmanPosY, -1, 0)
     elif code == 115:  # s
-        jeu[pacmanPosY + 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX, pacmanPosY + 1
+        pacmanMouvement(pacmanPosX, pacmanPosY, 0, 1)
     elif code == 100:  # d
-        jeu[pacmanPosY][pacmanPosX + 1] = jeu[pacmanPosY][pacmanPosX]
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX + 1, pacmanPosY
+        pacmanMouvement(pacmanPosX, pacmanPosY, 1, 0)
     elif code == 81:  # Q
         clear()
         print("Quit le jeu")
@@ -104,59 +126,36 @@ def userInputUnix():
             fd, termios.TCSADRAIN, old_settings
         )
 
-    return UserInputGame(ord(character), pacmanPosX, pacmanPosY)
+    return UserInputGame(ord(character))
 
 
 def UserInputWindows():
     if msvcrt.kbhit():
         character = msvcrt.getch()
-        return UserInputGame(ord(character), pacmanPosX, pacmanPosY)
-
-
-def check_mouvement(x,y):
-    UserInputWindows()
-    if "z" and jeu[x+1][y]==0:
-        return True
-    if "q" and 2[x][y-1]==0:
-        return True
-    if "s" and 2[x-1][y]==0:
-        return True
-    if "d" and 2[x][y+1]==0:
-        return True
-    else:
-        return False
-
-def jouer():
-    affiche_refresh(60)
-    UserInputWindows()
+        return UserInputGame(ord(character))
 
 
 # init
 jeu = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-fps = 60
-
-pacmanPosX = 9
-pacmanPosY = 7
-
 while True:
-    affiche_refresh(fps)
+    affiche_refresh(fps=60)
     if windows:
-        pos = userInputWindows()
+        UserInputWindows()
     else:
-        pacmanPosX, pacmanPosY = userInputUnix()
+        userInputUnix()
