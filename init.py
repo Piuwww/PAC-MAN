@@ -30,7 +30,6 @@ YELLOW = "\033[33m"  # Les couleurs
 RED = "\033[91m"
 GREY = "\033[90m"
 BLUE = "\033[34m"
-
 RESET = "\033[0m"  # Annule la couleur
 
 
