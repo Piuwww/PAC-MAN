@@ -1,4 +1,5 @@
 from os import system
+from random import randint
 from sys import platform
 from time import sleep
 
@@ -13,11 +14,10 @@ else:
 
 
 # fonction
-def affiche_refresh(a):  # a c'est le refresh rate fréquence de màj
-    for i in range(2):
-        clear()
-        affiche()
-        sleep(1 / a)
+def affiche_refresh(fps):
+    clear()
+    affiche()
+    sleep(1 / fps)
 
 
 def clear():
@@ -34,11 +34,18 @@ BLUE = "\033[34m"
 RESET = "\033[0m"  # Annule la couleur
 
 
+def locatePacman():
+    for i in range(len(jeu)):
+        for j in range(len(jeu[0])):
+            if jeu[i][j] == 2:
+                return j, i  # x, y
+
+
 def affiche():  # Pour faire jolie
     nombre = 0
     longueur = int(len(jeu))
     print("╭", end="")
-    print("─" * int(longueur * 2.8), end="")
+    print("─" * int(longueur * 2 + 5), end="")
     print("╮", end="")
     print()
     for ligne in jeu:
@@ -50,7 +57,11 @@ def affiche():  # Pour faire jolie
             elif case == 1:
                 print(f"{BLUE}8{RESET}", end=" ")
             elif case == 2:
-                print(f"{YELLOW}ᗤ{RESET}", end=" ")
+                if powered:
+                    print("ᗤ", end=" ")
+                else:
+                    print(f"{YELLOW}ᗤ{RESET}", end=" ")
+
             elif case == 3:
                 print(f"{RED}ᗣ{RESET}", end=" ")
             elif case == 4:
@@ -61,41 +72,45 @@ def affiche():  # Pour faire jolie
         print()
 
     print("╰", end="")
-    print("─" * int(longueur * 2.8), end="")
+    print("─" * int(longueur * 2 + 5), end="")
     print("╯")
 
     print("\n")
 
 
-def UserInputGame(code, pacmanPosX, pacmanPosY):
+def pacmanMouvement(pacmanPosX, pacmanPosY, a, b):
+    if pacmanPosX + a > len(jeu[0]) and jeu[pacmanPosY][0] == 0:
+        jeu[pacmanPosY][0] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return 0, pacmanPosY
+    elif pacmanPosX + a < 0 and jeu[pacmanPosY][len(jeu[0])] == 0:
+        jeu[pacmanPosY][len(jeu[0])] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return len(jeu), pacmanPosY
+    elif pacmanPosY + b > len(jeu) and jeu[0][pacmanPosX] == 0:
+        jeu[0][pacmanPosX] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return pacmanPosX, 0
+    elif pacmanPosX + b < 0 and jeu[len(jeu)][pacmanPosX] == 0:
+        jeu[len(jeu)][pacmanPosX] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+        return pacmanPosX, len(jeu)
+    elif jeu[pacmanPosY + b][pacmanPosX + a] == 0:
+        jeu[pacmanPosY + b][pacmanPosX + a] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+
+
+def UserInputGame(code):
+    pacmanPosX, pacmanPosY = locatePacman()
+
     if code == 122:  # z
-        if jeu[pacmanPosY - 1][pacmanPosX] == 0 :
-            jeu[pacmanPosY - 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
-            jeu[pacmanPosY][pacmanPosX] = 0
-            return pacmanPosX , pacmanPosY -1
-        else :
-            return pacmanPosX , pacmanPosY
+        pacmanMouvement(pacmanPosX, pacmanPosY, 0, -1)
     elif code == 113:  # q
-        if jeu[pacmanPosY][pacmanPosX - 1] == 0 :
-            jeu[pacmanPosY][pacmanPosX - 1] = jeu[pacmanPosY][pacmanPosX]
-            jeu[pacmanPosY][pacmanPosX] = 0
-            return pacmanPosX - 1, pacmanPosY
-        else :
-            return pacmanPosX , pacmanPosY
+        pacmanMouvement(pacmanPosX, pacmanPosY, -1, 0)
     elif code == 115:  # s
-        if jeu[pacmanPosY + 1][pacmanPosX] == 0 :
-            jeu[pacmanPosY + 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
-            jeu[pacmanPosY][pacmanPosX] = 0
-            return pacmanPosX, pacmanPosY + 1
-        else :
-            return pacmanPosX , pacmanPosY
+        pacmanMouvement(pacmanPosX, pacmanPosY, 0, 1)
     elif code == 100:  # d
-        if jeu[pacmanPosY + 1][pacmanPosX] == 0 :
-            jeu[pacmanPosY + 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
-            jeu[pacmanPosY][pacmanPosX] = 0
-            return pacmanPosX , pacmanPosY + 1
-        else :
-            return pacmanPosX , pacmanPosY
+        pacmanMouvement(pacmanPosX, pacmanPosY, 1, 0)
     elif code == 81:  # Q
         clear()
         print("Quit le jeu")
@@ -115,34 +130,21 @@ def userInputUnix():
             fd, termios.TCSADRAIN, old_settings
         )
 
-    return UserInputGame(ord(character), pacmanPosX, pacmanPosY)
+    if character:
+        return UserInputGame(ord(character))
+    else:
+        return code
 
 
 def UserInputWindows():
     if msvcrt.kbhit():
         character = msvcrt.getch()
-        return UserInputGame(ord(character), pacmanPosX, pacmanPosY)
+        if character:
+            return ord(character)
+        else:
+            return code
 
 
-def check_mouvement(x,y):
-    UserInputWindows()
-    if "z" and jeu[x+1][y]==0:
-        return True
-    if "q" and 2[x][y-1]==0:
-        return True
-    if "s" and 2[x-1][y]==0:
-        return True
-    if "d" and 2[x][y+1]==0:
-        return True
-    else:
-        return False
-
-def jouer():
-    affiche_refresh(60)
-    UserInputWindows()
-
-
-# init
 jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -165,14 +167,14 @@ jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-fps = 60
-
-pacmanPosX = 9
-pacmanPosY = 7
+powered = False
 
 while True:
-    affiche_refresh(fps)
+    affiche_refresh(fps=8)
     if windows:
-        pos = UserInputWindows()
+        code = UserInputWindows()
     else:
-        zpacmanPosX, pacmanPosY = userInputUnix()
+        code = userInputUnix()
+
+    UserInputGame(code)
+
