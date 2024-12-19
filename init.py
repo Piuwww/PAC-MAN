@@ -31,7 +31,6 @@ YELLOW = "\033[33m"  # Les couleurs
 RED = "\033[91m"
 GREY = "\033[90m"
 BLUE = "\033[34m"
-
 RESET = "\033[0m"  # Annule la couleur
 
 
@@ -70,21 +69,33 @@ def affiche():  # Pour faire jolie
 
 def UserInputGame(code, pacmanPosX, pacmanPosY):
     if code == 122:  # z
-        jeu[pacmanPosY - 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX, pacmanPosY - 1
+        if jeu[pacmanPosY - 1][pacmanPosX] == 0 :
+            jeu[pacmanPosY - 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
+            jeu[pacmanPosY][pacmanPosX] = 0
+            return pacmanPosX , pacmanPosY -1
+        else :
+            return pacmanPosX , pacmanPosY
     elif code == 113:  # q
-        jeu[pacmanPosY][pacmanPosX - 1] = jeu[pacmanPosY][pacmanPosX]
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX - 1, pacmanPosY
+        if jeu[pacmanPosY][pacmanPosX - 1] == 0 :
+            jeu[pacmanPosY][pacmanPosX - 1] = jeu[pacmanPosY][pacmanPosX]
+            jeu[pacmanPosY][pacmanPosX] = 0
+            return pacmanPosX - 1, pacmanPosY
+        else :
+            return pacmanPosX , pacmanPosY
     elif code == 115:  # s
-        jeu[pacmanPosY + 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX, pacmanPosY + 1
+        if jeu[pacmanPosY + 1][pacmanPosX] == 0 :
+            jeu[pacmanPosY + 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
+            jeu[pacmanPosY][pacmanPosX] = 0
+            return pacmanPosX, pacmanPosY + 1
+        else :
+            return pacmanPosX , pacmanPosY
     elif code == 100:  # d
-        jeu[pacmanPosY][pacmanPosX + 1] = jeu[pacmanPosY][pacmanPosX]
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX + 1, pacmanPosY
+        if jeu[pacmanPosY + 1][pacmanPosX] == 0 :
+            jeu[pacmanPosY + 1][pacmanPosX] = jeu[pacmanPosY][pacmanPosX]
+            jeu[pacmanPosY][pacmanPosX] = 0
+            return pacmanPosX , pacmanPosY + 1
+        else :
+            return pacmanPosX , pacmanPosY
     elif code == 81:  # Q
         clear()
         print("Quit le jeu")
@@ -157,6 +168,6 @@ pacmanPosY = 7
 while True:
     affiche_refresh(fps)
     if windows:
-        pos = userInputWindows()
+        pos = UserInputWindows()
     else:
-        pacmanPosX, pacmanPosY = userInputUnix()
+        zpacmanPosX, pacmanPosY = userInputUnix()
