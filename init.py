@@ -27,6 +27,7 @@ def clear():
 
 
 YELLOW = "\033[33m"  # Les couleurs
+PURPLE = "\033[35m"
 RED = "\033[91m"
 GREY = "\033[90m"
 BLUE = "\033[34m"
@@ -38,6 +39,7 @@ def locatePacman():
         for j in range(len(jeu[0])):
             if jeu[i][j] == 2:
                 return j, i  # x, y
+    return False
 
 
 def affiche():  # Pour faire jolie
@@ -56,7 +58,7 @@ def affiche():  # Pour faire jolie
             elif case == 1:
                 print(f"{BLUE}8{RESET}", end=" ")
             elif case == 2:
-                if powered:
+                if PacmanPowered:
                     print("ᗤ", end=" ")
                 else:
                     print(f"{YELLOW}ᗤ{RESET}", end=" ")
@@ -64,7 +66,7 @@ def affiche():  # Pour faire jolie
             elif case == 3:
                 print(f"{RED}ᗣ{RESET}", end=" ")
             elif case == 4:
-                print("🍓", end=" ")
+                print(f"{PURPLE}ᗣ{RESET}", end=" ")
             else:
                 print("  ", end="")
         print("│", end="")
@@ -78,28 +80,20 @@ def affiche():  # Pour faire jolie
 
 
 def pacmanMouvement(pacmanPosX, pacmanPosY, a, b):
-    if pacmanPosX + a > len(jeu[0]) and jeu[pacmanPosY][0] == 0:
-        jeu[pacmanPosY][0] = 2
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return 0, pacmanPosY
-    elif pacmanPosX + a < 0 and jeu[pacmanPosY][len(jeu[0])] == 0:
-        jeu[pacmanPosY][len(jeu[0])] = 2
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return len(jeu), pacmanPosY
-    elif pacmanPosY + b > len(jeu) and jeu[0][pacmanPosX] == 0:
-        jeu[0][pacmanPosX] = 2
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX, 0
-    elif pacmanPosX + b < 0 and jeu[len(jeu)][pacmanPosX] == 0:
-        jeu[len(jeu)][pacmanPosX] = 2
-        jeu[pacmanPosY][pacmanPosX] = 0
-        return pacmanPosX, len(jeu)
-    elif jeu[pacmanPosY + b][pacmanPosX + a] == 0:
+    if jeu[pacmanPosY + b][pacmanPosX + a] == 0:
         jeu[pacmanPosY + b][pacmanPosX + a] = 2
         jeu[pacmanPosY][pacmanPosX] = 0
+    elif (
+        jeu[pacmanPosY + b][pacmanPosX + a] == 3
+        or jeu[pacmanPosY + b][pacmanPosX + a] == 4
+    ):
+        jeu[pacmanPosY][pacmanPosX] = jeu[pacmanPosY + b][pacmanPosX + a]
 
 
 def UserInputGame(code):
+    if not locatePacman():
+        return
+
     pacmanPosX, pacmanPosY = locatePacman()
 
     if code == 122:  # z
@@ -149,7 +143,7 @@ def locateFantomes():
     for i in range(len(jeu)):
         for j in range(len(jeu[0])):
             if jeu[i][j] == 3:
-                fantomes.append([i, j]) # y, x
+                fantomes.append([i, j])  # y, x
 
     return fantomes
 
@@ -161,8 +155,11 @@ def fantomeMouvement():
         return True
 
     for fantome in fantomes:
-        if jeu[fantome[0]][fantome[1]] == 2:
-            return "died"
+        if jeu[fantome[0]][fantome[1]] == 2 and PacmanPowered:
+            return False
+        elif jeu[fantome[0]][fantome[1]] == 2 and not PacmanPowered:
+            jeu[fantome[0]][fantome[1]] = 0
+            return None
 
 
 jeu = [
@@ -187,7 +184,7 @@ jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-powered = False
+PacmanPowered = False
 
 while True:
     affiche_refresh(fps=8)
@@ -198,7 +195,7 @@ while True:
 
     UserInputGame(code)
     win = fantomeMouvement()
-    if win == True:
+    if win:
         clear()
         print(f"""{YELLOW}
 __   __           __        __
@@ -209,7 +206,7 @@ __   __           __        __
 {RESET}""")
         exit()
 
-    elif win == "died":
+    elif win == False or not locatePacman():
         clear()
         print(f"""{RED}
 ▄██   ▄    ▄██████▄  ███    █▄       ████████▄   ▄█     ▄████████ ████████▄
@@ -222,3 +219,5 @@ __   __           __        __
  ▀█████▀   ▀██████▀  ████████▀       ████████▀  █▀     ██████████ ████████▀
 {RESET}""")
         exit()
+    elif win == None:
+        pass
