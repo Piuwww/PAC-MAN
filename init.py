@@ -34,6 +34,7 @@ GREY = "\033[90m"
 BLUE = "\033[34m"
 RESET = "\033[0m"  # Annule la couleur
 
+PacmanPowered = False
 
 def locatePacman():
     for i in range(len(jeu)):
@@ -56,18 +57,27 @@ def locatefantomesMV(p): #localiser un fantomes particulier
         for j in range(len(jeu[0])):
             if jeu[i][j] == p:
                 return j, i  # x, y
-    return False
+    return -1, -1 # Not found
 
 def pacmanMouvement(pacmanPosX, pacmanPosY, a, b):
+    global PacmanPowered
     if jeu[pacmanPosY + b][pacmanPosX + a] == 0:
         jeu[pacmanPosY + b][pacmanPosX + a] = 2
         jeu[pacmanPosY][pacmanPosX] = 0
     elif (
         jeu[pacmanPosY + b][pacmanPosX + a] == 3
         or jeu[pacmanPosY + b][pacmanPosX + a] == 4
-    ):
+    ) and not PacmanPowered:
         jeu[pacmanPosY][pacmanPosX] = jeu[pacmanPosY + b][pacmanPosX + a]
-
+    elif (
+        jeu[pacmanPosY + b][pacmanPosX + a] == 3
+        or jeu[pacmanPosY + b][pacmanPosX + a] == 4
+    ) and PacmanPowered:
+        jeu[pacmanPosY + b][pacmanPosX + a] = 2
+        jeu[pacmanPosY + b][pacmanPosX + a] = 0
+    elif jeu[pacmanPosY + b][pacmanPosX + a] == 5:
+        jeu[pacmanPosY + b][pacmanPosX + a] = 0
+        PacmanPowered = True
 
 def fantomeMouvement(fantomesPosX, fantomesPosY, a, b , fantome):
     if jeu[fantomesPosY + b][fantomesPosX + a] == 0:
@@ -75,16 +85,17 @@ def fantomeMouvement(fantomesPosX, fantomesPosY, a, b , fantome):
         jeu[fantomesPosY][fantomesPosX] = 0
 
 def fantomekill():  #le truc pour tuer le pacman 
+    global PacmanPowered
     fantomes = locateFantomes()
 
     if len(fantomes) == 0:
         return True
 
     for fantome in fantomes:
-        if jeu[fantome[0]][fantome[1]] == 2 and PacmanPowered:
+        if jeu[fantome[0]][fantome[1]] == 2 and not PacmanPowered:
             return False
-        elif jeu[fantome[0]][fantome[1]] == 2 and not PacmanPowered:
-            jeu[fantome[0]][fantome[1]] = 0
+
+        elif jeu[fantome[0]][fantome[1]] == 2 and PacmanPowered:
             return None
 
 def affiche():  # Pour faire jolie
@@ -112,6 +123,8 @@ def affiche():  # Pour faire jolie
                 print(f"{RED}ᗣ{RESET}", end=" ")
             elif case == 4:
                 print(f"{PURPLE}ᗣ{RESET}", end=" ")
+            elif case == 5:
+                print(f"{YELLOW}⬤{RESET}", end=" ")
             else:
                 print("  ", end="")
         print("│", end="")
@@ -143,10 +156,10 @@ def UserInputGame(code):
         exit()
 
 def IAinput(mv,p):
-    if not locateFantomes():
-        return
-    
     fantomePosX, fantomePosY = locatefantomesMV(p)
+
+    if fantomePosX == -1 and fantomePosY == -1:
+        return # Fantome not found
     if mv == 1:  # haut
         fantomeMouvement(fantomePosX, fantomePosY, 0, -1,p)
     elif mv == 2:  # bas
@@ -187,14 +200,11 @@ def UserInputWindows():
         else:
             return code
 
-
-
-
 jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 0, 1, 5, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
     [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
     [1, 0, 1, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 1, 0, 1],
     [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
@@ -206,20 +216,27 @@ jeu = [
     [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1],
     [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
     [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 5, 0, 0, 1, 0, 1],
     [1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
 PacmanPowered = False
+PoweredFrames = 0
 
 while True:
-    affiche_refresh(fps=8)
+    affiche_refresh(fps=4)
     if windows:
         code = UserInputWindows()
     else:
         code = userInputUnix()
+
+    if PacmanPowered:
+        PoweredFrames += 1
+        if PoweredFrames == 30:
+            PoweredFrames = 0
+            PacmanPowered = 0
 
     UserInputGame(code)
     IArandom(4)
@@ -237,6 +254,7 @@ __   __           __        __
 
     elif win == False or not locatePacman():
         clear()
+        print(locatePacman())
         print(f"""{RED}
 ▄██   ▄    ▄██████▄  ███    █▄       ████████▄   ▄█     ▄████████ ████████▄
 ███   ██▄ ███    ███ ███    ███      ███   ▀███ ███    ███    ███ ███   ▀███
