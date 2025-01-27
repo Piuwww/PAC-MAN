@@ -143,7 +143,7 @@ def UserInputGame(code):
         exit()
 
 def IAinput(mv,p):
-    if not locatePacman():
+    if not locateFantomes():
         return
     
     fantomePosX, fantomePosY = locatefantomesMV(p)
