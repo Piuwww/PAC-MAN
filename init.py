@@ -1,6 +1,7 @@
 from os import system
 from sys import platform
 from time import sleep
+import random
 
 windows = platform.startswith("win")
 
@@ -41,6 +42,50 @@ def locatePacman():
                 return j, i  # x, y
     return False
 
+def locateFantomes(): # localiser un fantomes pour tuer pacman
+    fantomes = []
+    for i in range(len(jeu)):
+        for j in range(len(jeu[0])):
+            if jeu[i][j] == 3 or jeu[i][j] == 4 or jeu[i][j] == 3 :
+                fantomes.append([i, j])  # y, x
+
+    return fantomes
+
+def locatefantomesMV(p): #localiser un fantomes particulier
+    for i in range(len(jeu)):
+        for j in range(len(jeu[0])):
+            if jeu[i][j] == p:
+                return j, i  # x, y
+    return False
+
+def pacmanMouvement(pacmanPosX, pacmanPosY, a, b):
+    if jeu[pacmanPosY + b][pacmanPosX + a] == 0:
+        jeu[pacmanPosY + b][pacmanPosX + a] = 2
+        jeu[pacmanPosY][pacmanPosX] = 0
+    elif (
+        jeu[pacmanPosY + b][pacmanPosX + a] == 3
+        or jeu[pacmanPosY + b][pacmanPosX + a] == 4
+    ):
+        jeu[pacmanPosY][pacmanPosX] = jeu[pacmanPosY + b][pacmanPosX + a]
+
+
+def fantomeMouvement(fantomesPosX, fantomesPosY, a, b , fantome):
+    if jeu[fantomesPosY + b][fantomesPosX + a] == 0:
+        jeu[fantomesPosY + b][fantomesPosX + a] = fantome
+        jeu[fantomesPosY][fantomesPosX] = 0
+
+def fantomekill():  #le truc pour tuer le pacman 
+    fantomes = locateFantomes()
+
+    if len(fantomes) == 0:
+        return True
+
+    for fantome in fantomes:
+        if jeu[fantome[0]][fantome[1]] == 2 and PacmanPowered:
+            return False
+        elif jeu[fantome[0]][fantome[1]] == 2 and not PacmanPowered:
+            jeu[fantome[0]][fantome[1]] = 0
+            return None
 
 def affiche():  # Pour faire jolie
     nombre = 0
@@ -78,18 +123,6 @@ def affiche():  # Pour faire jolie
 
     print("\n")
 
-
-def pacmanMouvement(pacmanPosX, pacmanPosY, a, b):
-    if jeu[pacmanPosY + b][pacmanPosX + a] == 0:
-        jeu[pacmanPosY + b][pacmanPosX + a] = 2
-        jeu[pacmanPosY][pacmanPosX] = 0
-    elif (
-        jeu[pacmanPosY + b][pacmanPosX + a] == 3
-        or jeu[pacmanPosY + b][pacmanPosX + a] == 4
-    ):
-        jeu[pacmanPosY][pacmanPosX] = jeu[pacmanPosY + b][pacmanPosX + a]
-
-
 def UserInputGame(code):
     if not locatePacman():
         return
@@ -109,6 +142,23 @@ def UserInputGame(code):
         print("Quit le jeu")
         exit()
 
+def IAinput(mv,p):
+    if not locatePacman():
+        return
+    
+    fantomePosX, fantomePosY = locatefantomesMV(p)
+    if mv == 1:  # haut
+        fantomeMouvement(fantomePosX, fantomePosY, 0, -1,p)
+    elif mv == 2:  # bas
+        fantomeMouvement(fantomePosX, fantomePosY, -1, 0,p)
+    elif mv == 3:  # gauche
+        fantomeMouvement(fantomePosX, fantomePosY, 0, 1,p)
+    elif mv == 4:  # droit
+        fantomeMouvement(fantomePosX, fantomePosY,1, 0,p)
+
+def IArandom(p):
+    mv = random.randint(1,4)
+    IAinput(mv,p)
 
 def userInputUnix():
     fd = sys.stdin.fileno()  # Ouvre un buffer/tty/terminal
@@ -138,33 +188,11 @@ def UserInputWindows():
             return code
 
 
-def locateFantomes():
-    fantomes = []
-    for i in range(len(jeu)):
-        for j in range(len(jeu[0])):
-            if jeu[i][j] == 3:
-                fantomes.append([i, j])  # y, x
-
-    return fantomes
-
-
-def fantomeMouvement():
-    fantomes = locateFantomes()
-
-    if len(fantomes) == 0:
-        return True
-
-    for fantome in fantomes:
-        if jeu[fantome[0]][fantome[1]] == 2 and PacmanPowered:
-            return False
-        elif jeu[fantome[0]][fantome[1]] == 2 and not PacmanPowered:
-            jeu[fantome[0]][fantome[1]] = 0
-            return None
 
 
 jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
     [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
     [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
@@ -194,7 +222,8 @@ while True:
         code = userInputUnix()
 
     UserInputGame(code)
-    win = fantomeMouvement()
+    IArandom(4)
+    win = fantomekill()
     if win:
         clear()
         print(f"""{YELLOW}
