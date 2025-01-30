@@ -57,10 +57,10 @@ def locateFantomes():  # localiser un fantomes pour tuer pacman
     return fantomes
 
 
-def locatefantome(p):  # localiser un fantomes particulier
+def locatefantome(fantome):  # localiser un fantomes particulier
     for i in range(len(jeu)):
         for j in range(len(jeu[0])):
-            if jeu[i][j] == p:
+            if jeu[i][j] == fantome:
                 return j, i  # x, y
     return -1, -1  # Not found
 
@@ -83,8 +83,8 @@ def pacmanMouvement(pacmanPosX, pacmanPosY, a, b):
     ) and PacmanPowered:
         jeu[pacmanPosY + b][pacmanPosX + a] = 2
         jeu[pacmanPosY + b][pacmanPosX + a] = 0
-    elif jeu[pacmanPosY + b][pacmanPosX + a] == 6:
-        jeu[pacmanPosY + b][pacmanPosX + a] = 0
+    elif powerups[pacmanPosY + b][pacmanPosX + a] == 6:
+        powerups[pacmanPosY + b][pacmanPosX + a] = 0
         PacmanPowered = True
 
 
@@ -111,40 +111,45 @@ def fantomekill():  # le truc pour tuer le pacman
 
 def affiche():  # Pour faire jolie
     nombre = 0
-    longueur = int(len(jeu))
+    longeur = int(len(jeu))
     print("╭", end="")
-    print("─" * int(longueur * 2 + 5), end="")
+    print("─" * int(longeur * 2 + 5), end="")
     print("╮", end="")
     print()
+
+    hauteur = -1
+
     for ligne in jeu:
-        nombre += 1
+        hauteur += 1
         print("│ ", end="")
+        coorX = -1
         for case in ligne:
-            if case == 0:
-                print(f"{GREY}·{RESET}", end=" ")
-            elif case == 1:
+            coorX += 1
+            if case == 1:
                 print(f"{BLUE}8{RESET}", end=" ")
             elif case == 2:
                 if PacmanPowered:
                     print(f"{BOLD}ᗤ{RESET}", end=" ")
                 else:
                     print(f"{YELLOW}ᗤ{RESET}", end=" ")
-
             elif case == 3:
                 print(f"{RED}ᗣ{RESET}", end=" ")
             elif case == 4:
                 print(f"{PURPLE}ᗣ{RESET}", end=" ")
             elif case == 5:
                 print(f"{GREEN}ᗣ{RESET}", end=" ")
-            elif case == 6:
+            elif powerups[hauteur][coorX] == 6:
                 print(f"{YELLOW}⬤{RESET}", end=" ")
+            elif case == 0:
+                print(f"{GREY}·{RESET}", end=" ")
             else:
                 print("  ", end="")
+
         print("│", end="")
         print()
 
     print("╰", end="")
-    print("─" * int(longueur * 2 + 5), end="")
+    print("─" * int(longeur * 2 + 5), end="")
     print("╯")
     print(f"\n{BOLD}SHIFT + Q{RESET}: Exit, {BOLD}Movement{RESET}: ZQSD or Arrow keys")
 
@@ -249,7 +254,7 @@ jeu = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
-    [1, 0, 1, 6, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
     [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
     [1, 0, 1, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 1, 0, 1],
     [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
@@ -261,10 +266,33 @@ jeu = [
     [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1],
     [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
     [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 6, 0, 0, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
     [1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+]
+
+
+powerups = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
 PacmanPowered = False
