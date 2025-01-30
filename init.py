@@ -89,10 +89,9 @@ def pacmanMouvement(pacmanPosX, pacmanPosY, a, b):
 
 
 def fantomeMouvement(fantomesPosX, fantomesPosY, a, b, fantome):
-    if jeu[fantomesPosY + b][fantomesPosX + a] == 0:
+    if jeu[fantomesPosY + b][fantomesPosX + a] == 0 or jeu[fantomesPosY + b][fantomesPosX + a] == 2:
         jeu[fantomesPosY + b][fantomesPosX + a] = fantome
         jeu[fantomesPosY][fantomesPosX] = 0
-
 
 def fantomekill():  # le truc pour tuer le pacman
     global PacmanPowered
@@ -312,14 +311,17 @@ while True:
 
     if PacmanPowered:
         PoweredFrames += 1
-        if PoweredFrames == 160:  # Powerup dure 10s
+        if PoweredFrames == 80:  # Powerup dure 5s
             PoweredFrames = 0
             PacmanPowered = False
 
     fantomeX5, fantomeY5 = locatefantome(5)
     if frames % 160 or (fantomeX5 == randomCoorX and fantomeY5 == randomCoorY):
-        randomCoorX = random.randint(0, len(jeu) - 1)
-        randomCoorY = random.randint(0, len(jeu[0]) - 1)
+        while True:
+            randomCoorX = random.randint(0, len(jeu) - 1)
+            randomCoorY = random.randint(0, len(jeu[0]) - 1)
+            if jeu[randomCoorY][randomCoorX] == 0:
+                break
 
     if frames % 2 == 0:
         UserInputGame(code)
