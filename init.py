@@ -172,6 +172,9 @@ def UserInputGame(code):
 
 
 def IArandom(fantome):
+    if not locatePacman():
+        return
+
     fantomeX, fantomeY = locatefantome(fantome)
 
     if fantomeX == -1 and fantomeY == -1:
@@ -191,6 +194,31 @@ def IArandom(fantome):
         elif mouvement == 4 and jeu[fantomeY][fantomeX + 1] != 1:  # droit
             fantomeMouvement(fantomeX, fantomeY, 1, 0, fantome)
             return
+
+
+def IAPointRandom(fantome, coorX, coorY):
+    if not locatePacman():
+        return
+
+    fantomeX, fantomeY = locatefantome(fantome)
+
+    if fantomeX == -1 and fantomeY == -1:
+        return
+
+    if randomCoorX > fantomeX and jeu[fantomeY][fantomeX + 1] != 1:
+        fantomeMouvement(fantomeX, fantomeY, 1, 0, fantome)
+        return
+    elif randomCoorX < fantomeX and jeu[fantomeY][fantomeX - 1] != 1:
+        fantomeMouvement(fantomeX, fantomeY, -1, 0, fantome)
+        return
+    elif randomCoorY > fantomeY and jeu[fantomeY + 1][fantomeX] != 1:
+        fantomeMouvement(fantomeX, fantomeY, 0, 1, fantome)
+        return
+    elif randomCoorY < fantomeY and jeu[fantomeY - 1][fantomeX] != 1:
+        fantomeMouvement(fantomeX, fantomeY, 0, -1, fantome)
+        return
+    else:
+        IArandom(fantome)
 
 
 def IAInteligent():
@@ -218,25 +246,27 @@ def IAInteligent():
 
 
 def userInputUnix():
+    global code
     fd = sys.stdin.fileno()  # Ouvre un buffer/tty/terminal
     old_settings = termios.tcgetattr(fd)  # Prend les paramètres du buffer/tty
     try:
         tty.setraw(  # Ne print pas les charactères écrits, pas besoin de <enter>
             sys.stdin.fileno()
         )
-        character = sys.stdin.read(1)  # Lis 1 seule charactère
+        character = ord(sys.stdin.read(1))  # Lis 1 seule charactère
     finally:
         termios.tcsetattr(  # Définis les paramètres du tty/buffer
             fd, termios.TCSADRAIN, old_settings
         )
 
     if character:
-        return UserInputGame(ord(character))
+        return UserInputGame(character)
     else:
         return code
 
 
 def UserInputWindows():
+    global code
     if msvcrt.kbhit():
         character = msvcrt.getch()
         if character:
@@ -269,9 +299,12 @@ jeu = [
 
 PacmanPowered = False
 PoweredFrames = 0
+frames = 0
+randomCoorX = random.randint(0, len(jeu) - 1)
+randomCoorY = random.randint(0, len(jeu[0]) - 1)
 
 while True:
-    affiche_refresh(fps=8)
+    affiche_refresh(fps=16)
     if windows:
         code = UserInputWindows()
     else:
@@ -279,13 +312,21 @@ while True:
 
     if PacmanPowered:
         PoweredFrames += 1
-        if PoweredFrames == 80:  # Powerup dure 10s
+        if PoweredFrames == 160:  # Powerup dure 10s
             PoweredFrames = 0
             PacmanPowered = False
 
-    UserInputGame(code)
+    fantomeX5, fantomeY5 = locatefantome(5)
+    if frames % 160 or (fantomeX5 == randomCoorX and fantomeY5 == randomCoorY):
+        randomCoorX = random.randint(0, len(jeu) - 1)
+        randomCoorY = random.randint(0, len(jeu[0]) - 1)
+
+    if frames % 2 == 0:
+        UserInputGame(code)
+        IAInteligent()  # Execute l'IA du fantome 3
+        IAPointRandom(5, randomCoorX, randomCoorY)  # Execute l'IA du fantome 5
+
     IArandom(4)  # Execute l'IA du fantome 4
-    IAInteligent()  # Execute l'IA du fantome 5
 
     win = fantomekill()
     if win:
